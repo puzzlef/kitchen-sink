@@ -3,6 +3,7 @@
 #include <utility>
 #include "_main.hxx"
 
+using std::pair;
 using std::vector;
 using std::move;
 
@@ -96,4 +97,25 @@ struct PagerankResult {
     if (!q) fillAt(a, T(1)/N, x.vertices());
     return {a, 0, 0};
   }
+};
+
+
+
+
+// PAGERANK-CACHE
+// --------------
+
+#ifndef PC_GET
+#ifndef PAGERANK_CACHED
+#define PC_GET(c, v) CMOVE(!c.empty(), c, v)
+#define PC_SET(c, v) c = move(v)
+#else
+#define PC_GET(c, v) (v)
+#define PC_SET(c, v)
+#endif
+#endif
+
+template <class T>
+struct PagerankCache {
+  pair<vector<int>, int> ksnMd;
 };

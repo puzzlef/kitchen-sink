@@ -1,9 +1,23 @@
 #pragma once
 #include <chrono>
+#include <utility>
 
 using std::chrono::microseconds;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
+using std::move;
+
+
+
+
+// CMOVE
+// -----
+// Conditional move.
+
+#ifndef CMOVE
+#define CMOVE(c, te, fe) \
+  ((c)? move(te) : fe)
+#endif
 
 
 

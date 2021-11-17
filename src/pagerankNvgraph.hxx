@@ -16,8 +16,8 @@ using std::is_same;
 // PAGERANK-CORE
 // -------------
 
-template <class G, class T=float>
-PagerankResult<T> pagerankNvgraphCore(const G& xt, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
+template <class G, class J, class T=float>
+PagerankResult<T> pagerankNvgraphCore(const G& xt, const J& ks, const vector<T> *q, PagerankOptions<T> o) {
   T   p = o.damping;
   T   E = o.tolerance;
   int L = o.maxIterations;
@@ -30,7 +30,6 @@ PagerankResult<T> pagerankNvgraphCore(const G& xt, const vector<T> *q=nullptr, P
   vector<cudaDataType_t> etype {type};
   vector<T> ranks(N);
   if (N==0) return {ranks};
-  auto ks    = vertices(xt);
   auto vfrom = sourceOffsets(xt);
   auto efrom = destinationIndices(xt);
   auto vdata = vertexData(xt, ks, [&](int v) { return xt.vertexData(v)==0? T(1) : T(); });
@@ -76,7 +75,8 @@ PagerankResult<T> pagerankNvgraphCore(const G& xt, const vector<T> *q=nullptr, P
 // @returns {ranks, iterations, time}
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankNvgraph(const G& x, const H& xt, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
-  return pagerankNvgraphCore(xt, q, o);
+  auto ks = vertices(xt);
+  return pagerankNvgraphCore(xt, ks, q, o);
 }
 template <class G, class T=float>
 PagerankResult<T> pagerankNvgraph(const G& x, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
