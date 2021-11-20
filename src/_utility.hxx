@@ -11,14 +11,20 @@ using std::chrono::duration_cast;
 // MEASURE
 // -------
 
+template <class T>
+float durationMilliseconds(const T& start, const T& stop) {
+  auto a = duration_cast<microseconds>(stop - start);
+  return a.count()/1000.0f;
+}
+
+
 template <class F>
 float measureDuration(F fn, int N=1) {
   auto start = high_resolution_clock::now();
   for (int i=0; i<N; i++)
     fn();
   auto stop = high_resolution_clock::now();
-  auto duration = duration_cast<microseconds>(stop - start);
-  return duration.count()/(N*1000.0f);
+  return durationMilliseconds(start, stop)/N;
 }
 
 
