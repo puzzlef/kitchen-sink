@@ -18,6 +18,13 @@ float durationMilliseconds(const T& start, const T& stop) {
 }
 
 
+template <class T>
+float durationMilliseconds(const T& start, const T& stop) {
+  auto a = duration_cast<microseconds>(stop - start);
+  return a.count()/1000.0f;
+}
+
+
 template <class F>
 float measureDuration(F fn, int N=1) {
   auto start = high_resolution_clock::now();

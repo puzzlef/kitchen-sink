@@ -81,6 +81,8 @@ struct PagerankResult {
   int   iterations;
   float time;
 
+  PagerankResult() = default;
+
   PagerankResult(vector<T>&& ranks, int iterations=0, float time=0) :
   ranks(ranks), iterations(iterations), time(time) {}
 
