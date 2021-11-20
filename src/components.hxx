@@ -60,12 +60,17 @@ auto componentIds(const G& x, const vector2d<int>& cs) {
 
 template <class H, class G>
 void blockgraph(H& a, const G& x, const vector2d<int>& cs) {
+  auto t0 = high_resolution_clock::now();
   auto c = componentIds(x, cs);
+  auto t1 = high_resolution_clock::now();
   for (int u : x.vertices()) {
     a.addVertex(c[u]);
     for (int v : x.edges(u))
       if (c[u] != c[v]) a.addEdge(c[u], c[v]);
   }
+  auto t2 = high_resolution_clock::now();
+  printf("[%09.3f ms] auto c = componentIds(x, cs);\n", durationMilliseconds(t0, t1));
+  printf("[%09.3f ms] ...\n", durationMilliseconds(t1, t2));
 }
 
 template <class G>
@@ -82,25 +87,15 @@ auto blockgraph(const G& x, const vector2d<int>& cs) {
 
 template <class G>
 auto sortedComponents(const G& x, vector2d<int> cs) {
-  auto t0 = high_resolution_clock::now();
   auto b = blockgraph(x, cs);
-  auto t1 = high_resolution_clock::now();
   auto bks = topologicalSort(b);
-  auto t2 = high_resolution_clock::now();
   reorder(cs, bks);
-  auto t3 = high_resolution_clock::now();
-  printf("[%09.3f ms] auto b = blockgraph(x, cs);\n", durationMilliseconds(t0, t1));
-  printf("[%09.3f ms] auto bks = topologicalSort(b);\n", durationMilliseconds(t1, t2));
-  printf("[%09.3f ms] reorder(cs, bks);\n", durationMilliseconds(t2, t3));
   return cs;
 }
 
 template <class G, class H>
 auto sortedComponents(const G& x, const H& xt) {
-  auto t0 = high_resolution_clock::now();
   auto cs = components(x, xt);
-  auto t1 = high_resolution_clock::now();
-  printf("[%09.3f ms] auto cs = components(x, xt);\n", durationMilliseconds(t0, t1));
   return sortedComponents(x, cs);
 }
 
