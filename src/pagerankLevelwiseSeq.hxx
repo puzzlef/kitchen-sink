@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include <chrono>
 #include "_main.hxx"
 #include "vertices.hxx"
 #include "edges.hxx"
@@ -15,7 +14,6 @@
 
 using std::vector;
 using std::swap;
-using std::chrono::high_resolution_clock;
 
 
 
@@ -52,16 +50,9 @@ int pagerankLevelwiseSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vec
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankLevelwiseSeq(const G& x, const H& xt, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
   int  N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
-  auto t0 = high_resolution_clock::now();
   auto cs = joinUntilSize(sortedComponents(x, xt), MIN_COMPUTE_PR());
-  auto t1 = high_resolution_clock::now();
   auto ns = transformIter(cs, [&](const auto& c) { return c.size(); });
-  auto t2 = high_resolution_clock::now();
   auto ks = join(cs);
-  auto t3 = high_resolution_clock::now();
-  printf("[%09.3f ms] auto cs = joinUntilSize(sortedComponents(x, xt), MIN_COMPUTE_PR());\n", durationMilliseconds(t0, t1));
-  printf("[%09.3f ms] auto ns = transformIter(cs, [&](const auto& c) { return c.size(); });\n", durationMilliseconds(t1, t2));
-  printf("[%09.3f ms] auto ks = join(cs);\n", durationMilliseconds(t2, t3));
   return pagerankSeq(xt, ks, 0, ns, pagerankLevelwiseSeqLoop<T, decltype(ns)>, q, o);
 }
 template <class G, class T=float>

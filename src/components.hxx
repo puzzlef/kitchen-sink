@@ -1,11 +1,13 @@
 #pragma once
 #include <vector>
+#include <chrono>
 #include "_main.hxx"
 #include "vertices.hxx"
 #include "dfs.hxx"
 #include "topologicalSort.hxx"
 
 using std::vector;
+using std::chrono::high_resolution_clock;
 
 
 
@@ -80,15 +82,25 @@ auto blockgraph(const G& x, const vector2d<int>& cs) {
 
 template <class G>
 auto sortedComponents(const G& x, vector2d<int> cs) {
+  auto t0 = high_resolution_clock::now();
   auto b = blockgraph(x, cs);
+  auto t1 = high_resolution_clock::now();
   auto bks = topologicalSort(b);
+  auto t2 = high_resolution_clock::now();
   reorder(cs, bks);
+  auto t3 = high_resolution_clock::now();
+  printf("[%09.3f ms] auto b = blockgraph(x, cs);\n", durationMilliseconds(t0, t1));
+  printf("[%09.3f ms] auto bks = topologicalSort(b);\n", durationMilliseconds(t1, t2));
+  printf("[%09.3f ms] reorder(cs, bks);\n", durationMilliseconds(t2, t3));
   return cs;
 }
 
 template <class G, class H>
 auto sortedComponents(const G& x, const H& xt) {
+  auto t0 = high_resolution_clock::now();
   auto cs = components(x, xt);
+  auto t1 = high_resolution_clock::now();
+  printf("[%09.3f ms] auto cs = components(x, xt);\n", durationMilliseconds(t0, t1));
   return sortedComponents(x, cs);
 }
 
