@@ -441,6 +441,12 @@ void fillAt(vector<T>& a, int i, const U& v, const J& is) {
 // SUM
 // ---
 
+template <class T>
+T sum(const T& v) {
+  return v;
+}
+
+
 template <class T, class U=T>
 U sum(const T *x, int N, U a=U()) {
   for (int i=0; i<N; i++)
