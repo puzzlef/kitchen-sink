@@ -13,7 +13,7 @@ void transpose(H& a, const G& x) {
     a.addVertex(u, x.vertexData(u));
   for (int u : x.vertices()) {
     for (int v : x.edges(u))
-      a.addEdge(v, u, x.edgeData(u, v));
+      a.addEdge(v, u); // , x.edgeData(u, v)); (TODO: uncomment)
   }
 }
 
@@ -35,7 +35,7 @@ void transposeWithDegree(H& a, const G& x) {
     a.addVertex(u, x.degree(u));
   for (int u : x.vertices()) {
     for (int v : x.edges(u))
-      a.addEdge(v, u, x.edgeData(u, v));
+      a.addEdge(v, u); // , x.edgeData(u, v)); (TODO: uncomment)
   }
 }
 

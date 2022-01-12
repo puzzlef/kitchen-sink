@@ -18,7 +18,7 @@ using std::cout;
 template <class V=NONE, class E=NONE>
 class DiGraph {
   template <class T>
-  using Bitset = BitsetPsorted<T>;
+  using Bitset = BitsetPsorted<int, T>;
 
   public:
   using TVertex = V;
