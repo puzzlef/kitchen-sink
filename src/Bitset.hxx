@@ -85,7 +85,7 @@ class BitsetUnsorted {
 
   void add(K k, V v=V()) {
     if (has(k)) return;
-    ids.push_back({k, v});
+    pairs.push_back({k, v});
   }
 
   void remove(K k) {

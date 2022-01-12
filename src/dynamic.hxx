@@ -161,8 +161,8 @@ auto affectedOutVertices(const G& x, const G& y) {
 template <class G, class FA>
 auto dynamicVerticesByMark(const G& y, FA fa) {
   auto vis = createContainer(y, bool());
-  if(fa(vis)) return make_pair(vertices(y), y.order());
-  vector<int> a; int n = 0;
+  if(fa(vis)) return make_pair(vertices(y), size_t(y.order()));
+  vector<int> a; size_t n = 0;
   for (int u : y.vertices())
     if (vis[u]) { a.push_back(u); ++n; }
   return make_pair(a, n);
