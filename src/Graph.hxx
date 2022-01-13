@@ -917,9 +917,9 @@ template <class G>
 void writeGraphDetailed(ostream& a, const G& x) {
   a << "order: " << x.order() << " size: " << x.size();
   a << (x.directed()? " [directed]" : " [undirected]") << " {\n";
-  for (auto [u, d] : x.vertexKeys()) {
+  for (auto [u, d] : x.vertices()) {
     a << u << ":" << d << " ->";
-    for (auto [v, w] : x.edgeKeys(u))
+    for (auto [v, w] : x.edges(u))
       a << " " << v << ":" << w;
     a << "\n";
   }
