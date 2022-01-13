@@ -1,5 +1,5 @@
 #pragma once
-#include "DiGraph.hxx"
+#include "Graph.hxx"
 
 
 
@@ -9,12 +9,10 @@
 
 template <class H, class G>
 void transpose(H& a, const G& x) {
-  for (int u : x.vertices())
-    a.addVertex(u, x.vertexData(u));
-  for (int u : x.vertices()) {
-    for (int v : x.edges(u))
-      a.addEdge(v, u); // , x.edgeData(u, v)); (TODO: uncomment)
-  }
+  x.forEachVertex([&](auto u, auto d) { a.addVertex(u, d); });
+  x.forEachVertex([&](auto u, auto _) {
+    x.forEachEdge([&](auto v, auto d) { a.addEdge(v, u, d); });
+  });
 }
 
 template <class G>
@@ -31,17 +29,16 @@ auto transpose(const G& x) {
 
 template <class H, class G>
 void transposeWithDegree(H& a, const G& x) {
-  for (int u : x.vertices())
-    a.addVertex(u, x.degree(u));
-  for (int u : x.vertices()) {
-    for (int v : x.edges(u))
-      a.addEdge(v, u); // , x.edgeData(u, v)); (TODO: uncomment)
-  }
+  x.forEachVertexKey([&](auto u) { a.addVertex(u, x.degree(u)); });
+  x.forEachVertexKey([&](auto u) {
+    x.forEachEdge([&](auto v, auto d) { a.addEdge(v, u, d); });
+  });
 }
 
 template <class G>
 auto transposeWithDegree(const G& x) {
-  using E = typename G::TEdge;
-  DiGraph<int, E> a; transposeWithDegree(a, x);
+  using K = typename G::key_type;
+  using E = typename G::edge_type;
+  UDiGraphSorted<K, size_t, E> a; transposeWithDegree(a, x);
   return a;
 }

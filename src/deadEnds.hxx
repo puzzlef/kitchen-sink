@@ -24,7 +24,7 @@ bool isDeadEnd(const G& x, int u) {
 
 template <class G, class F>
 void deadEndsForEach(const G& x, F fn) {
-  for (int u : x.vertices())
+  for (int u : x.vertexKeys())
     if (isDeadEnd(x, u)) fn(u);
 }
 
@@ -55,8 +55,8 @@ auto recursiveDeadEndsForEach(const G& x, F fn) {
   auto fdead = [&](int u) { return a.count(u)>0; };
   while (a.size() > N) {
     N = a.size();
-    for (int u : x.vertices())
-      if (allOf(x.edges(u), fdead) && a.count(u)==0) { a.insert(u); fn(u); }
+    for (int u : x.vertexKeys())
+      if (allOf(x.edgeKeys(u), fdead) && a.count(u)==0) { a.insert(u); fn(u); }
   }
   return a;
 }

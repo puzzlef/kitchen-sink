@@ -250,9 +250,9 @@ void write(ostream& a, const DiGraph<V, E>& x, bool all=false) {
   a << "order: " << x.order() << " size: " << x.size();
   if (!all) { a << " {}"; return; }
   a << " {\n";
-  for (int u : x.vertices()) {
+  for (int u : x.vertexKeys()) {
     a << "  " << u << " ->";
-    for (int v : x.edges(u))
+    for (int v : x.edgeKeys(u))
       a << " " << v;
     a << "\n";
   }

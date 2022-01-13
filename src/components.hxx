@@ -18,7 +18,7 @@ auto components(const G& x, const H& xt) {
   vector<int> vs;
   // original dfs
   auto vis = createContainer(x, bool());
-  for (int u : x.vertices())
+  for (int u : x.vertexKeys())
     if (!vis[u]) dfsEndLoop(vs, vis, x, u);
   // transpose dfs
   fill(vis, false);
@@ -59,9 +59,9 @@ auto componentIds(const G& x, const vector2d<int>& cs) {
 template <class H, class G>
 void blockgraph(H& a, const G& x, const vector2d<int>& cs) {
   auto c = componentIds(x, cs);
-  for (int u : x.vertices()) {
+  for (int u : x.vertexKeys()) {
     a.addVertex(c[u]);
-    for (int v : x.edges(u))
+    for (int v : x.edgeKeys(u))
       if (c[u] != c[v]) a.addEdge(c[u], c[v]);
   }
 }

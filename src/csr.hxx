@@ -27,7 +27,7 @@ auto sourceOffsets(const G& x, const J& ks) {
 
 template <class G>
 auto sourceOffsets(const G& x) {
-  return sourceOffsets(x, x.vertices());
+  return sourceOffsets(x, x.vertexKeys());
 }
 
 
@@ -41,7 +41,7 @@ auto destinationIndices(const G& x, const J& ks, F fp) {
   vector<int> a;
   auto ids = indices(ks);
   for (int u : ks) {
-    append(a, x.edges(u));
+    append(a, x.edgeKeys(u));
     auto ie = a.end(), ib = ie-x.degree(u);
     fp(ib, ie); transform(ib, ie, ib, [&](int v) { return ids[v]; });
   }
@@ -55,5 +55,5 @@ auto destinationIndices(const G& x, const J& ks) {
 
 template <class G>
 auto destinationIndices(const G& x) {
-  return destinationIndices(x, x.vertices());
+  return destinationIndices(x, x.vertexKeys());
 }

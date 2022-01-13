@@ -11,7 +11,7 @@ using std::make_tuple;
 template <class G>
 int minDegree(const G& x) {
   int dmin = x.order();
-  for (int u : x.vertices()) {
+  for (int u : x.vertexKeys()) {
     int d = x.degree(u);
     if (d<dmin) dmin = d;
   }
@@ -21,7 +21,7 @@ int minDegree(const G& x) {
 template <class G>
 int maxDegree(const G& x) {
   int dmax = 0;
-  for (int u : x.vertices()) {
+  for (int u : x.vertexKeys()) {
     int d = x.degree(u);
     if (d>dmax) dmax = d;
   }
@@ -39,7 +39,7 @@ template <class G>
 auto minMaxAvgDegree(const G& x) {
   int dmin = x.order();
   int dmax = 0;
-  for (int u : x.vertices()) {
+  for (int u : x.vertexKeys()) {
     int d = x.degree(u);
     if (d<dmin) dmin = d;
     if (d>dmax) dmax = d;

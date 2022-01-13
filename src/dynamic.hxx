@@ -50,12 +50,12 @@ bool isChangedVertex(const G& x, const H& xt, const G& y, const H& yt, int u) {
 
 template <class G, class F>
 void changedVerticesDo(const G& x, const G& y, F fn) {
-  for (int u : y.vertices())
+  for (int u : y.vertexKeys())
     if (isChangedVertex(x, y, u)) fn(u);
 }
 template <class G, class H, class F>
 void changedVerticesDo(const G& x, const H& xt, const G& y, const H& yt, F fn) {
-  for (int u : y.vertices())
+  for (int u : y.vertexKeys())
     if (isChangedVertex(x, xt, y, yt, u)) fn(u);
 }
 
@@ -79,9 +79,9 @@ auto changedVertices(const G& x, const H& xt, const G& y, const H& yt) {
 
 template <class G>
 bool hasAffectedDeadEnd(const G& x, const G& y, const vector<bool>& vis) {
-  for (int u : x.vertices())
+  for (int u : x.vertexKeys())
     if (isDeadEnd(x, u) && !y.hasVertex(u)) return true;
-  for (int u : y.vertices())
+  for (int u : y.vertexKeys())
     if (isDeadEnd(y, u) && vis[u]) return true;
   return false;
 }
@@ -108,8 +108,8 @@ bool affectedOutVerticesMark(vector<bool>& vis, const G& x, const G& y) {
 
 template <class G, class F>
 void affectedVerticesDoInt(const G& x, const G& y, const vector<bool>& vis, F fn) {
-  if (hasAffectedDeadEnd(x, y, vis)) forEach(y.vertices(), fn);
-  else forEach(y.vertices(), [&](int u) { if (vis[u]) fn(u); });
+  if (hasAffectedDeadEnd(x, y, vis)) forEach(y.vertexKeys(), fn);
+  else forEach(y.vertexKeys(), [&](int u) { if (vis[u]) fn(u); });
 }
 
 template <class G, class H, class F>
@@ -163,7 +163,7 @@ auto dynamicVerticesByMark(const G& y, FA fa) {
   auto vis = createContainer(y, bool());
   if(fa(vis)) return make_pair(vertices(y), size_t(y.order()));
   vector<int> a; size_t n = 0;
-  for (int u : y.vertices())
+  for (int u : y.vertexKeys())
     if (vis[u]) { a.push_back(u); ++n; }
   return make_pair(a, n);
 }
@@ -172,7 +172,7 @@ template <class G, class FA>
 auto dynamicVerticesBy(const G& y, FA fa) {
   vector<int> a; unordered_set<int> aff;
   fa([&](int u) { a.push_back(u); aff.insert(u); });
-  for (int u : y.vertices())
+  for (int u : y.vertexKeys())
     if (aff.count(u)==0) a.push_back(u);
   return make_pair(a, aff.size());
 }

@@ -20,7 +20,7 @@ bool hasSelfLoop(const G& x, int u) {
 
 template <class G, class F>
 void selfLoopForEach(const G& x, F fn) {
-  for (int u : x.vertices())
+  for (int u : x.vertexKeys())
     if (x.hasEdge(u, u)) fn(u);
 }
 
@@ -45,7 +45,7 @@ int selfLoopCount(const G& x) {
 
 template <class G, class F>
 void selfLoopTo(G& a, F fn) {
-  for (int u : a.vertices())
+  for (int u : a.vertexKeys())
     if (fn(u)) a.addEdge(u, u);
 }
 

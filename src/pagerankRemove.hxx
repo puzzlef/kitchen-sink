@@ -20,7 +20,7 @@ void pagerankRemoveCalculate(vector<T>& a, const G& xr, const H& xt, const J& ks
   int N = coalesce(xr.order(), 1);  // can be empty!
   for (int u : ks) {
     a[u] = (1-p)/N;
-    for (int v : xt.edges(u))
+    for (int v : xt.edgeKeys(u))
       a[u] += (p/coalesce(xr.degree(v), 1)) * a[v];  // degree can be 0!
   }
 }

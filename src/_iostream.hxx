@@ -67,7 +67,7 @@ ostream& operator<<(ostream& a, const vector<T>& x) {
 // ------
 
 template <class T>
-void print(const T& x) {cout << x; }
+void print(const T& x) { cout << x; }
 
 template <class T>
 void println(const T& x) { cout << x << "\n"; }

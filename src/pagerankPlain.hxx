@@ -80,7 +80,7 @@ template <class G, class FL, class T=float>
 PagerankResult<T> pagerankPlain(const G& x, FL fl, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
   int  N  = x.order();
   auto xt = transposeWithDegree(x);
-  return pagerankPlainCore(xt, xt.vertices(), 0, N, fl, q, o);
+  return pagerankPlainCore(xt, xt.vertexKeys(), 0, N, fl, q, o);
 }
 
 template <class G, class T=float>

@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
+#include <unordered_set>
 #include <iterator>
 #include <algorithm>
 #include "_main.hxx"
 
 using std::vector;
+using std::unordered_set;
 using std::transform;
 using std::back_inserter;
 using std::equal;
@@ -17,8 +19,9 @@ using std::equal;
 
 template <class G, class F, class D>
 auto vertices(const G& x, F fm, D fp) {
-  vector<int> a;
-  append(a, x.vertices());
+  using K = typename G::key_type;
+  vector<K> a;
+  append(a, x.vertexKeys());
   auto ie = a.end(), ib = a.begin();
   fp(ib, ie); transform(ib, ie, ib, fm);
   return a;
@@ -37,14 +40,34 @@ auto vertices(const G& x) {
 
 
 
+// VERTEX-SET
+// ----------
+
+template <class G, class F, class D>
+auto vertexSet(const G& x, F fm) {
+  using K = typename G::key_type;
+  unordered_set<K> a;
+  x.forEachVertexKey([&](K u) { a.insert(fm(u)) });
+  return a;
+}
+
+template <class G>
+auto vertexSet(const G& x) {
+  return vertexSet(x, [](int u) { return u; });
+}
+
+
+
+
 // VERTEX-DATA
 // -----------
 
 template <class G, class J, class F, class D>
 auto vertexData(const G& x, const J& ks, F fm, D fp) {
-  using V = decltype(fm(0));
+  using K = typename G::key_type;
+  using V = decltype(fm(K()));
   vector<V> a;
-  vector<int> b;
+  vector<K> b;
   append(b, ks);
   auto ie = b.end(), ib = b.begin();
   fp(ib, ie); transform(ib, ie, back_inserter(a), fm);
@@ -63,7 +86,7 @@ auto vertexData(const G& x, const J& ks) {
 
 template <class G>
 auto vertexData(const G& x) {
-  return vertexData(x, x.vertices());
+  return vertexData(x, x.vertexKeys());
 }
 
 
@@ -90,7 +113,7 @@ void decompressContainer(vector<T>& a, const G& x, const vector<T>& vs, const J&
 
 template <class G, class T>
 void decompressContainer(vector<T>& a, const G& x, const vector<T>& vs) {
-  decompressContainer(a, x, vs, x.vertices());
+  decompressContainer(a, x, vs, x.vertexKeys());
 }
 
 template <class G, class T, class J>
@@ -102,7 +125,7 @@ auto decompressContainer(const G& x, const vector<T>& vs, const J& ks) {
 
 template <class G, class T>
 auto decompressContainer(const G& x, const vector<T>& vs) {
-  return decompressContainer(x, vs, x.vertices());
+  return decompressContainer(x, vs, x.vertexKeys());
 }
 
 
@@ -113,7 +136,7 @@ void compressContainer(vector<T>& a, const G& x, const vector<T>& vs, const J& k
 
 template <class G, class T>
 void compressContainer(vector<T>& a, const G& x, const vector<T>& vs) {
-  return compressContainer(a, x, vs, x.vertices());
+  return compressContainer(a, x, vs, x.vertexKeys());
 }
 
 template <class G, class T, class J>
@@ -125,7 +148,7 @@ auto compressContainer(const G& x, const vector<T>& vs, const J& ks) {
 
 template <class G, class T>
 auto compressContainer(const G& x, const vector<T>& vs) {
-  return compressContainer(x, vs, x.vertices());
+  return compressContainer(x, vs, x.vertexKeys());
 }
 
 
@@ -137,11 +160,11 @@ auto compressContainer(const G& x, const vector<T>& vs) {
 template <class G>
 bool verticesEqual(const G& x, int u, const G& y, int v) {
   if (x.degree(u) != y.degree(v)) return false;
-  auto xe = x.edges(u), ye = y.edges(v);
+  auto xe = x.edgeKeys(u), ye = y.edgeKeys(v);
   return equal(xe.begin(), xe.end(), ye.begin());
 }
 
 template <class G, class H>
 bool verticesEqual(const G& x, const H& xt, int u, const G& y, const H& yt, int v) {
-  return verticesEqual(x, u, y, u) && verticesEqual(xt, u, yt, u);
+  return verticesEqual(x, u, y, v) && verticesEqual(xt, u, yt, v);
 }

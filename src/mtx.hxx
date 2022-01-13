@@ -5,7 +5,7 @@
 #include <fstream>
 #include <algorithm>
 #include "_main.hxx"
-#include "DiGraph.hxx"
+#include "Graph.hxx"
 
 using std::string;
 using std::istream;
@@ -54,7 +54,7 @@ void readMtx(G& a, istream& s) {
 }
 
 auto readMtx(istream& s) {
-  DiGraph<> a; readMtx(a, s);
+  UOutDiGraphSorted<> a; readMtx(a, s);
   return a;
 }
 
@@ -67,7 +67,7 @@ void readMtx(G& a, const char *pth) {
 }
 
 auto readMtx(const char *pth) {
-  DiGraph<> a; readMtx(a, pth);
+  UOutDiGraphSorted<> a; readMtx(a, pth);
   return a;
 }
 
@@ -81,10 +81,11 @@ template <class G>
 void writeMtx(ostream& a, const G& x) {
   a << "%%MatrixMarket matrix coordinate real asymmetric\n";
   a << x.order() << " " << x.order() << " " << x.size() << "\n";
-  for (int u : x.vertices()) {
-    for (int v : x.edges(u))
-      a << u << " " << v << " " << x.edgeData(u) << "\n";
-  }
+  x.forEachVertexKey([&](auto u) {
+    x.forEachEdge([&](auto v, auto d) {
+      a << u << " " << v << " " << d << "\n";
+    });
+  });
 }
 
 template <class G>

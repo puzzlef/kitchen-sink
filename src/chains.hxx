@@ -45,7 +45,7 @@ auto chainsFromSize(const G& x, const H& xt, const J& ks, int n) {
 
 template <class G, class H>
 auto chainsFromSize(const G& x, const H& xt, int n) {
-  return chainsFromSize(x, xt, x.vertices(), n);
+  return chainsFromSize(x, xt, x.vertexKeys(), n);
 }
 
 template <class G, class H, class J>
@@ -55,5 +55,5 @@ auto chains(const G& x, const H& xt, const J& ks) {
 
 template <class G, class H>
 auto chains(const G& x, const H& xt) {
-  return chains(x, xt, x.vertices());
+  return chains(x, xt, x.vertexKeys());
 }

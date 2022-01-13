@@ -19,7 +19,7 @@ using std::back_inserter;
 template <class G, class F, class D>
 auto edges(const G& x, int u, F fm, D fp) {
   vector<int> a;
-  append(a, x.edges(u));
+  append(a, x.edgeKeys(u));
   auto ie = a.end(), ib = a.begin();
   fp(ib, ie); transform(ib, ie, ib, fm);
   return a;
@@ -43,7 +43,7 @@ auto edges(const G& x, int u) {
 
 template <class G, class F>
 auto edge(const G& x, int u, F fm) {
-  for (int v : x.edges(u))
+  for (int v : x.edgeKeys(u))
     return fm(v);
   return -1;
 }
@@ -65,7 +65,7 @@ auto edgeData(const G& x, const J& ks, F fm, D fp) {
   vector<E> a;
   vector<int> b;
   for (int u : ks) {
-    b.clear(); append(b, x.edges(u));
+    b.clear(); append(b, x.edgeKeys(u));
     auto ie = b.end(), ib = b.begin();
     fp(ib, ie); transform(ib, ie, back_inserter(a), [&](int v) { return fm(u, v); });
   }
@@ -84,7 +84,7 @@ auto edgeData(const G& x, const J& ks) {
 
 template <class G>
 auto edgeData(const G& x) {
-  return edgeData(x, x.vertices());
+  return edgeData(x, x.vertexKeys());
 }
 
 
@@ -95,14 +95,14 @@ auto edgeData(const G& x) {
 
 template <class G>
 bool allEdgesVisited(const G& x, int u, const vector<bool>& vis) {
-  for (int v : x.edges(u))
+  for (int v : x.edgeKeys(u))
     if (!vis[v]) return false;
   return true;
 }
 
 template <class G>
 bool someEdgesVisited(const G& x, int u, const vector<bool>& vis) {
-  for (int v : x.edges(u))
+  for (int v : x.edgeKeys(u))
     if (vis[v]) return true;
   return false;
 }
@@ -129,7 +129,7 @@ void addRandomEdgeByDegree(G& a, R& rnd, int span) {
   int un = int(dis(rnd) * deg * span);
   int vn = int(dis(rnd) * deg * span);
   int u = -1, v = -1, n = 0;
-  for (int w : a.vertices()) {
+  for (int w : a.vertexKeys()) {
     if (un<0 && un > n+a.degree(w)) u = w;
     if (vn<0 && vn > n+a.degree(w)) v = w;
     if (un>0 && vn>=0) break;
@@ -151,7 +151,7 @@ bool removeRandomEdge(G& a, R& rnd, int u) {
   uniform_real_distribution<> dis(0.0, 1.0);
   if (a.degree(u) == 0) return false;
   int vi = int(dis(rnd) * a.degree(u)), i = 0;
-  for (int v : a.edges(u))
+  for (int v : a.edgeKeys(u))
     if (i++ == vi) { a.removeEdge(u, v); return true; }
   return false;
 }
@@ -169,7 +169,7 @@ template <class G, class R>
 bool removeRandomEdgeByDegree(G& a, R& rnd) {
   uniform_real_distribution<> dis(0.0, 1.0);
   int v = int(dis(rnd) * a.size()), n = 0;
-  for (int u : a.vertices()) {
+  for (int u : a.vertexKeys()) {
     if (v > n+a.degree(u)) n += a.degree(u);
     else return removeRandomEdge(a, rnd, u);
   }
