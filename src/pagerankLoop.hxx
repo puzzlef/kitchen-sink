@@ -18,14 +18,14 @@ using std::vector;
 // @returns {ranks, iterations, time}
 template <class G, class T=float>
 PagerankResult<T> pagerankLoop(const G& x, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
-  auto xl = selfLoop(x, [&](int u) { return isDeadEnd(x, u); });
+  auto xl = selfLoop(x, [&](auto u) { return isDeadEnd(x, u); });
   return pagerankPlain(xl, q, o);
 }
 
 
 template <class G, class T=float>
 PagerankResult<T> pagerankLoopDynamic(const G& x, const G& y, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
-  auto xl = selfLoop(x, [&](int u) { return isDeadEnd(x, u); });
-  auto yl = selfLoop(y, [&](int u) { return isDeadEnd(y, u); });
+  auto xl = selfLoop(x, [&](auto u) { return isDeadEnd(x, u); });
+  auto yl = selfLoop(y, [&](auto u) { return isDeadEnd(y, u); });
   return pagerankPlainDynamic(xl, yl, q, o);
 }

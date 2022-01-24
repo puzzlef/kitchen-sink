@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_set>
 #include "_main.hxx"
-#include "copy.hxx"
+#include "duplicate.hxx"
 #include "transpose.hxx"
 #include "deadEnds.hxx"
 #include "pagerank.hxx"
@@ -16,11 +16,12 @@ using std::unordered_set;
 
 template <class G, class H, class J, class T>
 void pagerankRemoveCalculate(vector<T>& a, const G& xr, const H& xt, const J& ks, T p) {
-  a.resize(xt.span());  // ensure bounds!
-  int N = coalesce(xr.order(), 1);  // can be empty!
-  for (int u : ks) {
+  using K = typename G::key_type;
+  a.resize(xt.span());            // ensure bounds!
+  K N = coalesce(xr.order(), 1);  // can be empty!
+  for (auto u : ks) {
     a[u] = (1-p)/N;
-    for (int v : xt.edges(u))
+    for (auto v : xt.edgeKeys(u))
       a[u] += (p/coalesce(xr.degree(v), 1)) * a[v];  // degree can be 0!
   }
 }
@@ -36,7 +37,7 @@ void pagerankRemoveCalculate(vector<T>& a, const G& xr, const H& xt, const J& ks
 template <class G, class T=float>
 PagerankResult<T> pagerankRemove(const G& x, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
   T p = o.damping;
-  auto xr = copy(x, [&](int u) { return !isDeadEnd(x, u); });
+  auto xr = duplicate(x, [&](auto u) { return !isDeadEnd(x, u); });
   auto a  = pagerankPlain(xr, q, o);
   auto xt = transposeWithDegree(x);
   auto ks = deadEnds(x);
@@ -49,7 +50,7 @@ PagerankResult<T> pagerankRemove(const G& x, const vector<T> *q=nullptr, Pageran
 template <class G, class T=float>
 PagerankResult<T> pagerankRemoveDynamic(const G& x, const G& y, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
   T p = o.damping;
-  auto yr = copy(y, [&](int u) { return !isDeadEnd(y, u); });
+  auto yr = duplicate(y, [&](auto u) { return !isDeadEnd(y, u); });
   auto a  = pagerankPlainDynamic(x, yr, q, o);
   auto yt = transposeWithDegree(y);
   auto ks = deadEnds(y);

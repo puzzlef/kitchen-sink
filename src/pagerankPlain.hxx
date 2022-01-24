@@ -15,29 +15,29 @@ using std::swap;
 
 
 
-template <class T>
-void pagerankFactor(vector<T>& a, const vector<int>& vdata, int i, int n, T p) {
-  for (int u=i; u<i+n; u++) {
-    int d = vdata[u];
+template <class T, class K>
+void pagerankFactor(vector<T>& a, const vector<K>& vdata, K i, K n, T p) {
+  for (K u=i; u<i+n; u++) {
+    K d = vdata[u];
     a[u] = d>0? p/d : 0;
   }
 }
 
 
-template <class T>
-void pagerankCalculate(vector<T>& a, const vector<T>& c, const vector<int>& vfrom, const vector<int>& efrom, int i, int n, T c0) {
-  for (int v=i; v<i+n; v++)
-    a[v] = c0 + sumAt(c, sliceIter(efrom, vfrom[v], vfrom[v+1]));
+template <class T, class O, class K>
+void pagerankCalculate(vector<T>& a, const vector<T>& c, const vector<O>& vfrom, const vector<K>& efrom, K i, K n, T c0) {
+  for (K v=i; v<i+n; v++)
+    a[v] = c0 + sumValuesAt(c, sliceIterable(efrom, vfrom[v], vfrom[v+1]));
 }
 
 
-template <class T>
-int pagerankPlainLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<int>& vfrom, const vector<int>& efrom, const vector<int>& vdata, int i, int n, int N, T p, T E, int L) {
+template <class T, class O, class K>
+int pagerankPlainLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<O>& vfrom, const vector<K>& efrom, const vector<K>& vdata, K i, K n, K N, T p, T E, int L) {
   T c0 = (1-p)/N;
   int l = 1;
   for (; l<L; l++) {
-    if (l==1) multiply(c, r, f, 0, N);  // 1st time, find contrib for all
-    else      multiply(c, r, f, i, n);  // nth time, only those that changed
+    if (l==1) multiplyValues(r, f, c, 0, N);  // 1st time, find contrib for all
+    else      multiplyValues(r, f, c, i, n);  // nth time, only those that changed
     pagerankCalculate(a, c, vfrom, efrom, i, n, c0);  // only changed
     T el = l1Norm(a, r, 0, N);  // full error check, partial can be done too (i, n)
     if (el < E) break;
@@ -47,9 +47,9 @@ int pagerankPlainLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>&
 }
 
 
-template <class H, class J, class FL, class T=float>
-PagerankResult<T> pagerankPlainCore(const H& xt, const J& ks, int i, int n, FL fl, const vector<T> *q, PagerankOptions<T> o) {
-  int  N = xt.order();
+template <class H, class J, class K, class FL, class T=float>
+PagerankResult<T> pagerankPlainCore(const H& xt, const J& ks, K i, K n, FL fl, const vector<T> *q, PagerankOptions<T> o) {
+  K    N = xt.order();
   T    p = o.damping;
   T    E = o.tolerance;
   int  L = o.maxIterations, l = 0;
@@ -59,8 +59,8 @@ PagerankResult<T> pagerankPlainCore(const H& xt, const J& ks, int i, int n, FL f
   vector<T> a(N), r(N), c(N), f(N);
   float t = measureDurationMarked([&](auto mark) {
     if (q) r = compressContainer(xt, *q, ks);
-    else fill(r, T(1)/N);
-    copy(a, r);  // copy old ranks
+    else fillValue(r, T(1)/N);
+    copyValues(r, a);  // copy old ranks
     if (N==0 || n==0) return;  // skip if nothing to do!
     mark([&] { pagerankFactor(f, vdata, 0, N, p); });
     mark([&] { l = fl(a, r, c, f, vfrom, efrom, vdata, i, n, N, p, E, L); });  // with full error check, partial can be done too (E*n/N)
@@ -78,9 +78,9 @@ PagerankResult<T> pagerankPlainCore(const H& xt, const J& ks, int i, int n, FL f
 // @returns {ranks, iterations, time}
 template <class G, class FL, class T=float>
 PagerankResult<T> pagerankPlain(const G& x, FL fl, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
-  int  N  = x.order();
+  auto N  = x.order();
   auto xt = transposeWithDegree(x);
-  return pagerankPlainCore(xt, xt.vertices(), 0, N, fl, q, o);
+  return pagerankPlainCore(xt, xt.vertexKeys(), 0, N, fl, q, o);
 }
 
 template <class G, class T=float>
