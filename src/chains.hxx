@@ -1,12 +1,10 @@
 #pragma once
 #include <vector>
-#include <algorithm>
 #include "_main.hxx"
 #include "vertices.hxx"
 #include "edges.hxx"
 
 using std::vector;
-using std::reverse;
 
 
 
@@ -32,7 +30,7 @@ auto chainsFromSize(const G& x, const H& xt, const J& ks, size_t n) {
     // Traverse back.
     auto u = chainTraverse(b, vis, xt, x, v);
     if (x.degree(u)==1) b.push_back(u);
-    reverse(b.begin(), b.end());
+    reverseValues(b);
     if (b.size()>0) b.pop_back();
     // Traverse front.
     auto w = chainTraverse(b, vis, x, xt, v);

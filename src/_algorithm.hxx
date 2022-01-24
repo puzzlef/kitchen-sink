@@ -24,6 +24,8 @@ using std::count_if;
 using std::back_inserter;
 using std::copy;
 using std::transform;
+using std::sort;
+using std::reverse;
 using std::set_difference;
 using std::merge;
 using std::inplace_merge;
@@ -530,6 +532,22 @@ inline auto transformVector(const J& x, FM fm) {
 
 // SORT
 // ----
+// Lift your legs up.
+
+template <class I>
+inline void reverse_values(I ib, I ie) {
+  reverse(ib, ie);
+}
+template <class J>
+inline void reverseValues(J& x) {
+  reverse_values(x.begin(), x.end());
+}
+
+
+
+
+// SORT
+// ----
 // Arrange your portfolio by ROCE.
 
 template <class I>
@@ -542,11 +560,11 @@ inline void sort_values(I ib, I ie, FL fl) {
 }
 template <class J>
 inline void sortValues(J& x) {
-  sort(x.begin(), x.end());
+  sort_values(x.begin(), x.end());
 }
 template <class J, class FL>
 inline void sortValues(J& x, FL fl) {
-  sort(x.begin(), x.end(), fl);
+  sort_values(x.begin(), x.end(), fl);
 }
 
 
