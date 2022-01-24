@@ -30,13 +30,11 @@ inline auto sourceOffsetsAs(const G& x, T _) {
 
 template <class G, class J>
 inline auto sourceOffsets(const G& x, const J& ks) {
-  using K = typename G::key_type;
-  return sourceOffsetsAs(x, ks, K());
+  return sourceOffsetsAs(x, ks, size_t());
 }
 template <class G>
 inline auto sourceOffsets(const G& x) {
-  using K = typename G::key_type;
-  return sourceOffsetsAs(x, K());
+  return sourceOffsetsAs(x, size_t());
 }
 
 
