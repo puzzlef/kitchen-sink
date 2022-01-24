@@ -242,8 +242,8 @@ int main(int argc, char **argv) {
   char *file = argv[1];
   int repeat = argc>2? stoi(argv[2]) : 5;
   printf("Loading graph %s ...\n", file);
-  // auto fs = [&](float p) { printf("Loading graph %s [%04.1f] ...\n", file, 100*p); };
-  auto x  = readMtxOutDiGraph(file); println(x);
+  auto fs = [&](float p) { printf("Loading graph %s [%04.1f]%% ...\n", file, 100*p); };
+  auto x  = readMtxOutDiGraph(file, fs); println(x);
   runPagerank(x, repeat);
   printf("\n");
   return 0;
