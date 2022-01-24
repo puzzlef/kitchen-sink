@@ -30,27 +30,31 @@ void runPagerankBatch(const G& xo, int repeat, int steps, int batch) {
   default_random_engine rnd(dev());
 
   for (int i=0; i<steps; i++) {
-    auto x  = selfLoop(xo, [&](int u) { return isDeadEnd(xo, u); });
+    printf("step1\n");
+    auto x  = selfLoop(xo, [&](auto u) { return isDeadEnd(xo, u); });
     auto xt = transposeWithDegree(x);
     auto ksOld = vertices(x);
     auto a0 = pagerankMonolithicCuda(x, xt, init, {repeat});  // pagerankNvgraph(x, xt, init, {repeat});
     auto r0 = a0.ranks;
 
+    printf("step2\n");
     // Add random edges for this batch.
     auto yo = duplicate(xo);
     for (int i=0; i<batch; i++)
       addRandomEdge(yo, rnd, span);
-    auto y  = selfLoop(yo, [&](int u) { return isDeadEnd(yo, u); });
+    auto y  = selfLoop(yo, [&](auto u) { return isDeadEnd(yo, u); });
     auto yt = transposeWithDegree(y);
     auto ks = vertices(y);
     vector<T> s0(y.span());
-    int X = ksOld.size();
-    int Y = ks.size();
+    size_t X = ksOld.size();
+    size_t Y = ks.size();
 
+    printf("step3\n");
     // INSERTIONS:
     // Adjust ranks for insertions.
     adjustRanks(s0, r0, ksOld, ks, 0.0f, float(X)/(Y+1), 1.0f/(Y+1));
 
+    printf("step4\n");
     // Find Pagerank data.
     auto cs  = components(y, yt);
     auto b   = blockgraph(y, cs);
@@ -230,7 +234,7 @@ void runPagerankBatch(const G& xo, int repeat, int steps, int batch) {
 
 template <class G>
 void runPagerank(const G& x, int repeat) {
-  int M = x.size(), steps = 10;
+  size_t M = x.size(), steps = 10;
   for (int batch=10, i=0; batch<=10000; batch*=i&1? 2:5, i++) {
     printf("\n# Batch size %.0e\n", (double) batch);
     runPagerankBatch(x, repeat, steps, batch);
