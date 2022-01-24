@@ -92,7 +92,7 @@ struct PagerankResult {
   // Get initial ranks (when no vertices affected for dynamic pagerank).
   template <class G>
   static PagerankResult<T> initial(const G& x, const vector<T>* q=nullptr) {
-    int  N = x.order();
+    auto N = x.order();
     auto a = q? *q : createContainer(x, T());
     if (!q) fillAt(a, T(1)/N, x.vertices());
     return {a, 0, 0};
@@ -108,13 +108,16 @@ struct PagerankResult {
 
 template <class G>
 struct PagerankData {
+  private:
+  using K = typename G::key_type;
+  public:
   G blockgraph;
   G blockgraphTranspose;
-  vector2d<int> components;
+  vector2d<K> components;
 };
 
-template <class G>
-auto blockgraphD(const G& x, const vector2d<int>& cs, const PagerankData<G> *D) {
+template <class G, class K>
+auto blockgraphD(const G& x, const vector2d<K>& cs, const PagerankData<G> *D) {
   return D? D->blockgraph : blockgraph(x, cs);
 }
 

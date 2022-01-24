@@ -21,9 +21,9 @@ using std::max;
 // PAGERANK-LOOP
 // -------------
 
-template <class T, class J>
-int pagerankMonolithicCudaLoop(T *e, T *r0, T *eD, T *r0D, T *&aD, T *&rD, T *cD, const T *fD, const int *vfromD, const int *efromD, int i, const J& ns, int N, T p, T E, int L, int EF) {
-  int n = sumAbs(ns);
+template <class T, class K, class J>
+int pagerankMonolithicCudaLoop(T *e, T *r0, T *eD, T *r0D, T *&aD, T *&rD, T *cD, const T *fD, const size_t *vfromD, const K *efromD, K i, const J& ns, K N, T p, T E, int L, int EF) {
+  K   n = sumAbs(ns);
   int R = reduceSizeCu<T>(n);
   size_t R1 = R * sizeof(T);
   T  c0 = (1-p)/N;
@@ -54,10 +54,10 @@ int pagerankMonolithicCudaLoop(T *e, T *r0, T *eD, T *r0D, T *&aD, T *&rD, T *cD
 // @returns {ranks, iterations, time}
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankMonolithicCuda(const G& x, const H& xt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
-  int  N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
+  auto N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
   auto cs = pagerankCudaComponents(x, xt, o, D);
   auto ns = pagerankComponentWave(xt, cs);
-  auto ks = join<int>(cs);
+  auto ks = joinValuesVector(cs);
   return pagerankCuda(xt, ks, 0, ns, pagerankMonolithicCudaLoop<T, decltype(ns)>, q, o);
 }
 
@@ -75,10 +75,10 @@ PagerankResult<T> pagerankMonolithicCuda(const G& x, const vector<T> *q=nullptr,
 
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankMonolithicCudaDynamic(const G& x, const H& xt, const G& y, const H& yt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
-  int  N  = yt.order();                                              if (N==0) return PagerankResult<T>::initial(yt, q);
+  auto N  = yt.order();                                              if (N==0) return PagerankResult<T>::initial(yt, q);
   auto [cs, n] = pagerankCudaDynamicComponents(x, xt, y, yt, o, D);  if (n==0) return PagerankResult<T>::initial(yt, q);
-  auto ns = pagerankComponentWave(yt, sliceIter(cs, 0, n));
-  auto ks = join<int>(cs);
+  auto ns = pagerankComponentWave(yt, sliceIterable(cs, 0, n));
+  auto ks = joinValuesVector(cs);
   return pagerankCuda(yt, ks, 0, ns, pagerankMonolithicCudaLoop<T, decltype(ns)>, q, o);
 }
 

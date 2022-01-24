@@ -24,11 +24,11 @@ using std::swap;
 // PAGERANK-LOOP
 // -------------
 
-template <class T, class J>
-int pagerankComponentwiseCudaLoop(T *e, T *r0, T *eD, T *r0D, T *&aD, T *&rD, T *cD, const T *fD, const int *vfromD, const int *efromD, int i, const J& ws, int N, T p, T E, int L, int EF) {
+template <class T, class O, class K, class J>
+int pagerankComponentwiseCudaLoop(T *e, T *r0, T *eD, T *r0D, T *&aD, T *&rD, T *cD, const T *fD, const O *vfromD, const K *efromD, K i, const J& ws, K N, T p, T E, int L, int EF) {
   float l = 0;
   for (const auto& w : ws) {
-    const auto& [nt, nb] = w; int n = nt+nb;
+    const auto& [nt, nb] = w; auto n = nt+nb;
     if (n<=0) { i += -n; continue; }
     T np = T(n)/N, En = EF<=2? E*n/N : E;
     l += pagerankMonolithicCudaLoop(e, r0, eD, r0D, aD, rD, cD, fD, vfromD, efromD, i, w, N, p, En, L, EF)*np;
@@ -55,12 +55,12 @@ template <class G, class H, class T=float>
 PagerankResult<T> pagerankComponentwiseCuda(const G& x, const H& xt, const vector<T> *q, const PagerankOptions<T>& o, const PagerankData<G>& D) {
   const auto& cs = D.components;
   const auto& b  = D.blockgraph;
-  int  N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
+  auto N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
   auto ds = topologicalComponentsFrom(cs, b);
-  auto gs = joinUntilSize<int>(ds, o.minCompute);
+  auto gs = joinUntilSizeVector(ds, o.minCompute);
   forEach(gs, [&](auto& g) { pagerankPartition(xt, g); });
   auto ns = pagerankPairWave(xt, gs);
-  auto ks = join<int>(gs);
+  auto ks = joinValuesVector(gs);
   return pagerankCuda(xt, ks, 0, ns, pagerankComponentwiseCudaLoop<T, decltype(ns)>, q, o);
 }
 template <class G, class H, class T=float>
@@ -85,13 +85,13 @@ template <class G, class H, class T=float>
 PagerankResult<T> pagerankComponentwiseCudaDynamic(const G& x, const H& xt, const G& y, const H& yt, const vector<T> *q, const PagerankOptions<T>& o, const PagerankData<G>& D) {
   const auto& cs = D.components;
   const auto& b  = D.blockgraph;
-  int  N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
+  auto N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
   auto ds = topologicalComponentsFrom(cs, b);
   auto [is, n] = dynamicComponentIndices(x, y, ds, b);  if (n==0) return PagerankResult<T>::initial(yt, q);
-  auto gs = joinAtUntilSize<int>(ds, sliceIter(is, 0, n), o.minCompute);
+  auto gs = joinAtUntilSizeVector(ds, sliceIter(is, 0, n), o.minCompute);
   forEach(gs, [&](auto& g) { pagerankPartition(yt, g); });
   auto ns = pagerankPairWave(yt, gs);
-  auto ks = join<int>(gs); joinAt(gs, ds, sliceIter(is, n));
+  auto ks = joinValuesVector(gs); joinAt(ds, sliceIter(is, n), gs);
   return pagerankCuda(yt, ks, 0, ns, pagerankComponentwiseCudaLoop<T, decltype(ns)>, q, o);
 }
 template <class G, class H, class T=float>

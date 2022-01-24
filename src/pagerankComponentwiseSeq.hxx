@@ -24,10 +24,10 @@ using std::move;
 // PAGERANK-LOOP
 // -------------
 
-template <class T, class J>
-int pagerankComponentwiseSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<int>& vfrom, const vector<int>& efrom, int i, const J& ns, int N, T p, T E, int L, int EF) {
+template <class T, class O, class K, class J>
+int pagerankComponentwiseSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<O>& vfrom, const vector<K>& efrom, K i, const J& ns, K N, T p, T E, int L, int EF) {
   float l = 0;
-  for (int n : ns) {
+  for (auto n : ns) {
     if (n<=0) { i += -n; continue; }
     T np = T(n)/N, En = EF<=2? E*n/N : E;
     l += pagerankMonolithicSeqLoop(a, r, c, f, vfrom, efrom, i, n, N, p, En, L, EF)*np;
@@ -54,11 +54,11 @@ template <class G, class H, class T=float>
 PagerankResult<T> pagerankComponentwiseSeq(const G& x, const H& xt, const vector<T> *q, const PagerankOptions<T>& o, const PagerankData<G>& D) {
   const auto& cs = D.components;
   const auto& b  = D.blockgraph;
-  int  N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
+  auto N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
   auto ds = topologicalComponentsFrom(cs, b);
-  auto gs = joinUntilSize<int>(ds, o.minCompute);
-  auto ns = transformIter(gs, [&](const auto& g) { return g.size(); });
-  auto ks = join<int>(gs);
+  auto gs = joinUntilSizeVector(ds, o.minCompute);
+  auto ns = transformIterable(gs, [&](const auto& g) { return g.size(); });
+  auto ks = joinValuesVector(gs);
   return pagerankSeq(xt, ks, 0, ns, pagerankComponentwiseSeqLoop<T, decltype(ns)>, q, o);
 }
 template <class G, class H, class T=float>
@@ -83,12 +83,12 @@ template <class G, class H, class T=float>
 PagerankResult<T> pagerankComponentwiseSeqDynamic(const G& x, const H& xt, const G& y, const H& yt, const vector<T> *q, const PagerankOptions<T>& o, const PagerankData<G>& D) {
   const auto& cs = D.components;
   const auto& b  = D.blockgraph;
-  int  N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
+  auto N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
   auto ds = topologicalComponentsFrom(cs, b);
   auto [is, n] = dynamicComponentIndices(x, y, ds, b);  if (n==0) return PagerankResult<T>::initial(yt, q);
-  auto gs = joinAtUntilSize<int>(ds, sliceIter(is, 0, n), o.minCompute);
-  auto ns = transformIter(gs, [&](const auto& g) { return g.size(); });
-  auto ks = join<int>(gs); joinAt(ks, ds, sliceIter(is, n));
+  auto gs = joinAtUntilSizeVector(ds, sliceIterable(is, 0, n), o.minCompute);
+  auto ns = transformIterable(gs, [&](const auto& g) { return g.size(); });
+  auto ks = joinValuesVector(gs); joinAt(ds, sliceIterable(is, n), ks);
   return pagerankSeq(yt, ks, 0, ns, pagerankComponentwiseSeqLoop<T, decltype(ns)>, q, o);
 }
 template <class G, class H, class T=float>

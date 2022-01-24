@@ -237,7 +237,7 @@ void joinAt2d(const vector2d<T>& xs, const J& ig, vector2d<T>& a) {
     a.push_back(joinAtVector(xs, is));
 }
 template <class T, class J>
-inline auto joinAt2d(const vector2d<T>& xs, const J& ig) {
+inline auto joinAt2dVector(const vector2d<T>& xs, const J& ig) {
   vector2d<T> a; joinAt2d(xs, ig, a);
   return a;
 }

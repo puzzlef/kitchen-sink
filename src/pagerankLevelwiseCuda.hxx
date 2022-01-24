@@ -33,14 +33,14 @@ using std::swap;
 // @returns {ranks, iterations, time}
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankLevelwiseCuda(const G& x, const H& xt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
-  int  N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
+  auto N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
   const auto& cs = componentsD(x, xt, D);
   const auto& b  = blockgraphD(x, cs, D);
   const auto& bt = blockgraphTransposeD(b, D);
   auto gs = levelwiseGroupedComponentsFrom(cs, bt);
   forEach(gs, [&](auto& g) { pagerankPartition(xt, g); });
   auto ns = pagerankPairWave(xt, gs);
-  auto ks = join<int>(gs);
+  auto ks = joinValuesVector(gs);
   return pagerankCuda(xt, ks, 0, ns, pagerankComponentwiseCudaLoop<T, decltype(ns)>, q, o);
 }
 
@@ -58,17 +58,17 @@ PagerankResult<T> pagerankLevelwiseCuda(const G& x, const vector<T> *q=nullptr, 
 
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankLevelwiseCudaDynamic(const G& x, const H& xt, const G& y, const H& yt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
-  int  N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
+  auto N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
   const auto& cs = componentsD(y, yt, D);
   const auto& b  = blockgraphD(y, cs, D);
   const auto& bt = blockgraphTransposeD(b, D);
   auto gi = levelwiseGroupIndices(bt);
   auto [is, n] = dynamicComponentIndices(x, y, cs, b);  if (n==0) return PagerankResult<T>::initial(yt, q);
-  auto ig = groupBy<int>(sliceIter(is, 0, n), [&](int i) { return gi[i]; });
-  auto gs = joinAt2d(cs, ig);
+  auto ig = groupValuesVector(sliceIterable(is, 0, n), [&](auto i) { return gi[i]; });
+  auto gs = joinAt2dVector(cs, ig);
   forEach(gs, [&](auto& g) { pagerankPartition(yt, g); });
   auto ns = pagerankPairWave(yt, gs);
-  auto ks = join<int>(gs); joinAt(ks, cs, sliceIter(is, n));
+  auto ks = joinValuesVector(gs); joinAt(cs, sliceIterable(is, n), ks);
   return pagerankCuda(yt, ks, 0, ns, pagerankComponentwiseCudaLoop<T, decltype(ns)>, q, o);
 }
 

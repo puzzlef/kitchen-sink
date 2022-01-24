@@ -31,13 +31,13 @@ using std::swap;
 // @returns {ranks, iterations, time}
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankLevelwiseOmp(const G& x, const H& xt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
-  int  N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
+  size_t N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
   const auto& cs = componentsD(x, xt, D);
   const auto& b  = blockgraphD(x, cs, D);
   const auto& bt = blockgraphTransposeD(b, D);
   auto gs = levelwiseGroupedComponentsFrom(cs, bt);
-  auto ns = transformIter(gs, [&](const auto& g) { return g.size(); });
-  auto ks = join<int>(gs);
+  auto ns = transformIterable(gs, [&](const auto& g) { return g.size(); });
+  auto ks = joinValuesVector(gs);
   return pagerankOmp(xt, ks, 0, ns, pagerankComponentwiseOmpLoop<T, decltype(ns)>, q, o);
 }
 template <class G, class T=float>
@@ -54,16 +54,16 @@ PagerankResult<T> pagerankLevelwiseOmp(const G& x, const vector<T> *q=nullptr, c
 
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankLevelwiseOmpDynamic(const G& x, const H& xt, const G& y, const H& yt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
-  int  N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
+  auto N  = yt.order();                                 if (N==0) return PagerankResult<T>::initial(yt, q);
   const auto& cs = componentsD(y, yt, D);
   const auto& b  = blockgraphD(y, cs, D);
   const auto& bt = blockgraphTransposeD(b, D);
   auto gi = levelwiseGroupIndices(bt);
   auto [is, n] = dynamicComponentIndices(x, y, cs, b);  if (n==0) return PagerankResult<T>::initial(yt, q);
-  auto ig = groupBy<int>(sliceIter(is, 0, n), [&](int i) { return gi[i]; });
-  auto gs = joinAt2d<int>(cs, ig);
-  auto ns = transformIter(gs, [&](const auto& g) { return g.size(); });
-  auto ks = join<int>(gs); joinAt(ks, cs, sliceIter(is, n));
+  auto ig = groupValuesVector(sliceIterable(is, 0, n), [&](auto i) { return gi[i]; });
+  auto gs = joinAt2dVector(cs, ig);
+  auto ns = transformIterable(gs, [&](const auto& g) { return g.size(); });
+  auto ks = joinValuesVector(gs); joinAt(cs, sliceIterable(is, n), ks);
   return pagerankOmp(yt, ks, 0, ns, pagerankComponentwiseOmpLoop<T, decltype(ns)>, q, o);
 }
 
