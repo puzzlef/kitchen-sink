@@ -29,6 +29,9 @@ float ceilDiv<float>(float x, float y) { return ceil(x/y); }
 template <>
 double ceilDiv<double>(double x, double y) { return ceil(x/y); }
 
+template <class TX, class TY, class TA>
+TA ceilDivAs(TX x, TY y, TA _) { return TA((x + y-1) / y); }
+
 
 
 

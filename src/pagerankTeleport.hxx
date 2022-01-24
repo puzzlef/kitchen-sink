@@ -16,8 +16,8 @@ using std::any_of;
 
 
 
-template <class T, class O, class K>
-T pagerankTeleportContribution(const vector<T>& r, const vector<O>& vfrom, const vector<K>& efrom, const vector<K>& vdata, K N, T p) {
+template <class T, class K>
+T pagerankTeleportContribution(const vector<T>& r, const vector<size_t>& vfrom, const vector<K>& efrom, const vector<K>& vdata, K N, T p) {
   T a = (1-p)/N;
   for (K u=0; u<N; u++)
     if (vdata[u]==0) a += p*r[u]/N;
@@ -25,8 +25,8 @@ T pagerankTeleportContribution(const vector<T>& r, const vector<O>& vfrom, const
 }
 
 
-template <class T, class O, class K>
-int pagerankTeleportLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<O>& vfrom, const vector<K>& efrom, const vector<K>& vdata, K i, K n, K N, T p, T E, int L) {
+template <class T, class K>
+int pagerankTeleportLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<size_t>& vfrom, const vector<K>& efrom, const vector<K>& vdata, K i, K n, K N, T p, T E, int L) {
   int l = 1;
   for (; l<L; l++) {
     if (l==1) multiplyValues(r, f, c, 0, N);  // 1st time, find contrib for all

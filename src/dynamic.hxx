@@ -349,18 +349,18 @@ auto dynamicComponentIndicesBy(const G& y, const vector2d<K>& cs, FA fa) {
 template <class G, class H, class K, class B>
 auto dynamicComponentIndices(const G& x, const H& xt, const G& y, const H& yt, const vector2d<K>& cs, const B& b) {
   return dynamicComponentIndicesByMark(y, cs, [&](auto& vis) {
-    affectedComponentIndicesMark(vis, x, xt, y, yt, cs, b);
+    return affectedComponentIndicesMark(vis, x, xt, y, yt, cs, b);
   });
 }
 template <class G, class H, class K, class B>
 auto dynamicInComponentIndices(const G& x, const H& xt, const G& y, const H& yt, const vector2d<K>& cs, const B& b) {
   return dynamicComponentIndicesByMark(y, cs, [&](auto& vis) {
-    affectedInComponentIndicesMark(vis, x, xt, y, yt, cs, b);
+    return affectedInComponentIndicesMark(vis, x, xt, y, yt, cs, b);
   });
 }
 template <class G, class H, class K, class B>
 auto dynamicOutComponentIndices(const G& x, const H& xt, const G& y, const H& yt, const vector2d<K>& cs, const B& b) {
   return dynamicComponentIndicesByMark(y, cs, [&](auto& vis) {
-    affectedOutComponentIndicesDo(vis, x, xt, y, yt, cs, b);
+    return affectedOutComponentIndicesDo(vis, x, xt, y, yt, cs, b);
   });
 }

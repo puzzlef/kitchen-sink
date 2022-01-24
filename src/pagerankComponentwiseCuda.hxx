@@ -24,8 +24,8 @@ using std::swap;
 // PAGERANK-LOOP
 // -------------
 
-template <class T, class O, class K, class J>
-int pagerankComponentwiseCudaLoop(T *e, T *r0, T *eD, T *r0D, T *&aD, T *&rD, T *cD, const T *fD, const O *vfromD, const K *efromD, K i, const J& ws, K N, T p, T E, int L, int EF) {
+template <class T, class K, class J>
+int pagerankComponentwiseCudaLoop(T *e, T *r0, T *eD, T *r0D, T *&aD, T *&rD, T *cD, const T *fD, const size_t *vfromD, const K *efromD, K i, const J& ws, K N, T p, T E, int L, int EF) {
   float l = 0;
   for (const auto& w : ws) {
     const auto& [nt, nb] = w; auto n = nt+nb;

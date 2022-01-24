@@ -24,13 +24,13 @@ using std::move;
 // PAGERANK-LOOP
 // -------------
 
-template <class T, class O, class K, class J>
-int pagerankComponentwiseSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<O>& vfrom, const vector<K>& efrom, K i, const J& ns, K N, T p, T E, int L, int EF) {
+template <class T, class K, class J>
+int pagerankComponentwiseSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<size_t>& vfrom, const vector<K>& efrom, K i, const J& ns, K N, T p, T E, int L, int EF) {
   float l = 0;
   for (auto n : ns) {
     if (n<=0) { i += -n; continue; }
     T np = T(n)/N, En = EF<=2? E*n/N : E;
-    l += pagerankMonolithicSeqLoop(a, r, c, f, vfrom, efrom, i, n, N, p, En, L, EF)*np;
+    l += pagerankMonolithicSeqLoop(a, r, c, f, vfrom, efrom, i, K(n), N, p, En, L, EF)*np;
     swap(a, r);
     i += n;
   }

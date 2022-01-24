@@ -16,8 +16,8 @@ using std::swap;
 // PAGERANK-LOOP
 // -------------
 
-template <class T, class O, class K>
-int pagerankMonolithicSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<O>& vfrom, const vector<K>& efrom, K i, K n, K N, T p, T E, int L, int EF) {
+template <class T, class K>
+int pagerankMonolithicSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<size_t>& vfrom, const vector<K>& efrom, K i, K n, K N, T p, T E, int L, int EF) {
   int l = 0;
   T  c0 = (1-p)/N;  // non-teleport dead end handling!
   while (l<L) {
@@ -44,9 +44,10 @@ int pagerankMonolithicSeqLoop(vector<T>& a, vector<T>& r, vector<T>& c, const ve
 // @returns {ranks, iterations, time}
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankMonolithicSeq(const G& x, const H& xt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
+  using K = typename G::key_type;
   auto N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
   auto ks = pagerankVertices(x, xt, o, D);
-  return pagerankSeq(xt, ks, 0, N, pagerankMonolithicSeqLoop<T>, q, o);
+  return pagerankSeq(xt, ks, 0, N, pagerankMonolithicSeqLoop<T, K>, q, o);
 }
 
 template <class G, class T=float>
@@ -63,9 +64,10 @@ PagerankResult<T> pagerankMonolithicSeq(const G& x, const vector<T> *q=nullptr, 
 
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankMonolithicSeqDynamic(const G& x, const H& xt, const G& y, const H& yt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
+  using K = typename G::key_type;
   auto N = yt.order();                                         if (N==0) return PagerankResult<T>::initial(yt, q);
   auto [ks, n] = pagerankDynamicVertices(x, xt, y, yt, o, D);  if (n==0) return PagerankResult<T>::initial(yt, q);
-  return pagerankSeq(yt, ks, 0, n, pagerankMonolithicSeqLoop<T>, q, o);
+  return pagerankSeq(yt, ks, 0, n, pagerankMonolithicSeqLoop<T, K>, q, o);
 }
 
 template <class G, class T=float>

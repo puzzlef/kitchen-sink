@@ -182,7 +182,7 @@ inline auto joinValuesVector(const J& xs) {
   using I = decltype(xs.begin());
   using X = typename iterator_traits<I>::value_type;
   using T = typename X::value_type;  // only for vector!
-  vector<T> a; join(xs, a);
+  vector<T> a; joinValues(xs, a);
   return a;
 }
 
@@ -304,15 +304,15 @@ inline size_t copyValues(const vector<T>& x, vector<TA>& a, size_t i, size_t N) 
 // ----------
 
 template <class T, class V>
-void fillValue(T *a, size_t N, const V& v) {
+void fillValue(T *a, size_t N, V v) {
   fill(a, a+N, v);
 }
 template <class T, class V>
-inline void fillValue(vector<T>& a, const V& v) {
+inline void fillValue(vector<T>& a, V v) {
   fill(a.begin(), a.end(), v);
 }
 template <class T, class V>
-inline void fillValue(vector<T>& a, size_t i, size_t N, const V& v) {
+inline void fillValue(vector<T>& a, size_t i, size_t N, V v) {
   fill(a.begin()+i, a.begin()+i+N, v);
 }
 
@@ -323,16 +323,16 @@ inline void fillValue(vector<T>& a, size_t i, size_t N, const V& v) {
 // -------------
 
 template <class T, class J, class V>
-void fillValueAt(T *a, const J& is, const V& v) {
+void fillValueAt(T *a, const J& is, V v) {
   for (auto i : is)
     a[i] = v;
 }
 template <class T, class J, class V>
-inline void fillValueAt(vector<T>& a, const J& is, const V& v) {
+inline void fillValueAt(vector<T>& a, const J& is, V v) {
   fillValueAt(a.data(), is, v);
 }
 template <class T, class J, class V>
-inline void fillValueAt(vector<T>& a, size_t i, const J& is, const V& v) {
+inline void fillValueAt(vector<T>& a, size_t i, const J& is, V v) {
   fillValueAt(a.data()+i, is, v);
 }
 
@@ -431,16 +431,16 @@ inline V sumValuesAt(const vector<T>& x, size_t i, const J& is, V a=V()) {
 // ---------
 
 template <class T, class V>
-void addValue(T *a, size_t N, const V& v) {
+void addValue(T *a, size_t N, V v) {
   for (size_t i=0; i<N; ++i)
     a[i] += v;
 }
 template <class T, class V>
-inline void addValue(vector<T>& a, const V& v) {
+inline void addValue(vector<T>& a, V v) {
   addValue(a.data(), a.size(), v);
 }
 template <class T, class V>
-inline void addValue(vector<T>& a, size_t i, size_t N, const V& v) {
+inline void addValue(vector<T>& a, size_t i, size_t N, V v) {
   addValue(a.data()+i, N, v);
 }
 
@@ -534,16 +534,16 @@ inline V maxAt(const vector<T>& x, size_t i, const J& is, V a=V()) {
 // -------------
 
 template <class T, class V>
-void constrainMax(T *a, size_t N, const V& v) {
+void constrainMax(T *a, size_t N, V v) {
   for (size_t i=0; i<N; ++i)
     a[i] = max(a[i], v);
 }
 template <class T, class V>
-inline void constrainMax(vector<T>& a, const V& v) {
+inline void constrainMax(vector<T>& a, V v) {
   constrainMax(a.data(), a.size(), v);
 }
 template <class T, class V>
-inline void constrainMax(vector<T>& a, size_t i, size_t N, const V& v) {
+inline void constrainMax(vector<T>& a, size_t i, size_t N, V v) {
   constrainMax(a.data()+i, N, v);
 }
 
@@ -554,16 +554,16 @@ inline void constrainMax(vector<T>& a, size_t i, size_t N, const V& v) {
 // ----------------
 
 template <class T, class J, class V>
-void constrainMaxAt(T *a, const J& is, const V& v) {
+void constrainMaxAt(T *a, const J& is, V v) {
   for (auto i : is)
     a[i] = max(a[i], v);
 }
 template <class T, class J, class V>
-inline void constrainMaxAt(vector<T>& a, const J& is, const V& v) {
+inline void constrainMaxAt(vector<T>& a, const J& is, V v) {
   constrainMaxAt(a.data(), is, v);
 }
 template <class T, class J, class V>
-inline void constrainMaxAt(vector<T>& a, size_t i, const J& is, const V& v) {
+inline void constrainMaxAt(vector<T>& a, size_t i, const J& is, V v) {
   constrainMaxAt(a.data()+i, is, v);
 }
 
@@ -637,16 +637,16 @@ inline V minValueAt(const vector<T>& x, size_t i, const J& is, V a=V()) {
 // -------------
 
 template <class T, class V>
-void constrainMin(T *a, size_t N, const V& v) {
+void constrainMin(T *a, size_t N, V v) {
   for (size_t i=0; i<N; ++i)
     a[i] = min(a[i], v);
 }
 template <class T, class V>
-inline void constrainMin(vector<T>& a, const V& v) {
+inline void constrainMin(vector<T>& a, V v) {
   constrainMin(a.data(), a.size(), v);
 }
 template <class T, class V>
-inline void constrainMin(vector<T>& a, size_t i, size_t N, const V& v) {
+inline void constrainMin(vector<T>& a, size_t i, size_t N, V v) {
   constrainMin(a.data()+i, N, v);
 }
 
@@ -657,16 +657,16 @@ inline void constrainMin(vector<T>& a, size_t i, size_t N, const V& v) {
 // ----------------
 
 template <class T, class J, class V>
-void constrainMinAt(T *a, const J& is, const V& v) {
+void constrainMinAt(T *a, const J& is, V v) {
   for (auto i : is)
     a[i] = min(a[i], v);
 }
 template <class T, class J, class V>
-inline void constrainMinAt(vector<T>& a, const J& is, const V& v) {
+inline void constrainMinAt(vector<T>& a, const J& is, V v) {
   constrainMinAt(a.data(), is, v);
 }
 template <class T, class J, class V>
-inline void constrainMinAt(vector<T>& a, size_t i, const J& is, const V& v) {
+inline void constrainMinAt(vector<T>& a, size_t i, const J& is, V v) {
   constrainMinAt(a.data()+i, is, v);
 }
 
@@ -677,17 +677,17 @@ inline void constrainMinAt(vector<T>& a, size_t i, const J& is, const V& v) {
 // -------
 
 template <class TX, class TY, class V=TX>
-V l1Norm(const TX *x, const TY *y, size_t N, const V& a=V()) {
+V l1Norm(const TX *x, const TY *y, size_t N, V a=V()) {
   for (size_t i=0; i<N; i++)
     a += abs(x[i] - y[i]);
   return a;
 }
 template <class TX, class TY, class V=TX>
-inline V l1Norm(const vector<TX>& x, const vector<TY>& y, const V& a=V()) {
+inline V l1Norm(const vector<TX>& x, const vector<TY>& y, V a=V()) {
   return l1Norm(x.data(), y.data(), x.size(), a);
 }
 template <class TX, class TY, class V=TX>
-inline V l1Norm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, const V& a=V()) {
+inline V l1Norm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, V a=V()) {
   return l1Norm(x.data()+i, y.data()+i, N, a);
 }
 
@@ -698,17 +698,17 @@ inline V l1Norm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, co
 // -------
 
 template <class TX, class TY, class V=TX>
-V l2Norm(const TX *x, const TY *y, size_t N, const V& a=V()) {
+V l2Norm(const TX *x, const TY *y, size_t N, V a=V()) {
   for (size_t i=0; i<N; i++)
     a += (x[i] - y[i]) * (x[i] - y[i]);
   return sqrt(a);
 }
 template <class TX, class TY, class V=TX>
-inline V l2Norm(const vector<TX>& x, const vector<TY>& y, const V& a=V()) {
+inline V l2Norm(const vector<TX>& x, const vector<TY>& y, V a=V()) {
   return l2Norm(x.data(), y.data(), x.size(), a);
 }
 template <class TX, class TY, class V=TX>
-inline V l2Norm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, const V& a=V()) {
+inline V l2Norm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, V a=V()) {
   return l2Norm(x.data()+i, y.data()+i, N, a);
 }
 
@@ -719,17 +719,17 @@ inline V l2Norm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, co
 // ------------------
 
 template <class TX, class TY, class V=TX>
-V liNorm(const TX *x, const TY *y, size_t N, const V& a=V()) {
+V liNorm(const TX *x, const TY *y, size_t N, V a=V()) {
   for (size_t i=0; i<N; i++)
     a = max(a, abs(x[i] - y[i]));
   return a;
 }
 template <class TX, class TY, class V=TX>
-inline V liNorm(const vector<TX>& x, const vector<TY>& y, const V& a=V()) {
+inline V liNorm(const vector<TX>& x, const vector<TY>& y, V a=V()) {
   return liNorm(x.data(), y.data(), x.size(), a);
 }
 template <class TX, class TY, class V=TX>
-inline V liNorm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, const V& a=V()) {
+inline V liNorm(const vector<TX>& x, const vector<TY>& y, size_t i, size_t N, V a=V()) {
   return liNorm(x.data()+i, y.data()+i, N, a);
 }
 
@@ -760,15 +760,15 @@ inline void multiplyValues(const vector<TX>& x, const vector<TY>& y, vector<TA>&
 // --------------
 
 template <class T, class TA, class V>
-void multiplyValue(const T *x, const TA *a, size_t N, const V& v) {
+void multiplyValue(const T *x, const TA *a, size_t N, V v) {
   for (size_t i=0; i<N; i++)
     a[i] = TA(x[i] * v);
 }
 template <class T, class TA, class V>
-inline void multiplyValue(const vector<T>& x, vector<TA>& a, const V& v) {
+inline void multiplyValue(const vector<T>& x, vector<TA>& a, V v) {
   multiplyValue(x.data(), a.data(), x.size(), v);
 }
 template <class T, class TA, class V>
-inline void multiplyValue(const vector<T>& x, vector<TA>& a, size_t i, size_t N, const V& v) {
+inline void multiplyValue(const vector<T>& x, vector<TA>& a, size_t i, size_t N, V v) {
   multiplyValue(x.data()+i, a.data()+i, N, v);
 }

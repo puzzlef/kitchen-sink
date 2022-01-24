@@ -139,14 +139,14 @@ void __syncthreads();
 template <class T=float>
 int reduceMemcpySizeCu(size_t N) {
   const int B = BLOCK_DIM_RM<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_RM<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_RM<T>());
   return G;
 }
 
 template <class T=float>
 int reduceInplaceSizeCu(size_t N) {
   const int B = BLOCK_DIM_RI<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_RI<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_RI<T>());
   return G;
 }
 
@@ -187,7 +187,7 @@ __global__ void fillKernel(T *a, size_t N, T v) {
 template <class T>
 __host__ __device__ void fillCu(T *a, size_t N, T v) {
   const int B = BLOCK_DIM_M<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_M<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_M<T>());
   fillKernel<<<G, B>>>(a, N, v);
 }
 
@@ -214,7 +214,7 @@ __global__ void fillAtKernel(T *a, T v, const K *is, size_t IS) {
 template <class T, class K>
 __host__ __device__ void fillAtCu(T *a, T v, const K *is, size_t IS) {
   const int B = BLOCK_DIM_M<T>();
-  const int G = min(ceilDiv(IS, B), GRID_DIM_M<T>());
+  const int G = min(ceilDivAs(IS, B, int()), GRID_DIM_M<T>());
   fillAtKernel<<<G, B>>>(a, v, is, IS);
 }
 
@@ -241,7 +241,7 @@ __global__ void multiplyKernel(T *a, const T *x, const T* y, size_t N) {
 template <class T>
 void multiplyCu(T *a, const T *x, const T* y, size_t N) {
   const int B = BLOCK_DIM_M<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_M<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_M<T>());
   multiplyKernel<<<G, B>>>(a, x, y, N);
 }
 
@@ -268,7 +268,7 @@ __global__ void multiplyValueKernel(T *a, const T *x, T v, size_t N) {
 template <class T>
 void multiplyValueCu(T *a, const T *x, T v, size_t N) {
   const int B = BLOCK_DIM_M<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_M<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_M<T>());
   multiplyValueKernel<<<G, B>>>(a, x, v, N);
 }
 
@@ -310,14 +310,14 @@ __global__ void maxKernel(T *a, const T *x, size_t N) {
 template <class T>
 void maxMemcpyCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   maxKernel<<<G, B>>>(a, x, N);
 }
 
 template <class T>
 void maxInplaceCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   maxKernel<<<G, B>>>(a, x, N);
   maxKernel<<<1, G>>>(a, a, G);
 }
@@ -365,14 +365,14 @@ __global__ void sumKernel(T *a, const T *x, size_t N) {
 template <class T>
 void sumMemcpyCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumKernel<<<G, B>>>(a, x, N);
 }
 
 template <class T>
 void sumInplaceCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumKernel<<<G, B>>>(a, x, N);
   sumKernel<<<1, G>>>(a, a, G);
 }
@@ -410,14 +410,14 @@ __global__ void sumAbsKernel(T *a, const T *x, size_t N) {
 template <class T>
 void sumAbsMemcpyCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumAbsKernel<<<G, B>>>(a, x, N);
 }
 
 template <class T>
 void sumAbsInplaceCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumAbsKernel<<<G, B>>>(a, x, N);
   sumAbsKernel<<<1, G>>>(a, a, G);
 }
@@ -455,14 +455,14 @@ __global__ void sumSqrKernel(T *a, const T *x, size_t N) {
 template <class T>
 void sumSqrMemcpyCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumSqrKernel<<<G, B>>>(a, x, N);
 }
 
 template <class T>
 void sumSqrInplaceCu(T *a, const T *x, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumSqrKernel<<<G, B>>>(a, x, N);
   sumSqrKernel<<<1, G>>>(a, a, G);
 }
@@ -500,14 +500,14 @@ __global__ void sumAtKernel(T *a, const T *x, const K *is, size_t IS) {
 template <class T, class K>
 void sumAtMemcpyCu(T *a, const T *x, const K *is, size_t IS) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(IS, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(IS, B, int()), GRID_DIM_R<T>());
   sumAtKernel<<<G, B>>>(a, x, is, IS);
 }
 
 template <class T, class K>
 void sumAtInplaceCu(T *a, const T *x, const K *is, size_t IS) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(IS, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(IS, B, int()), GRID_DIM_R<T>());
   sumAtKernel<<<G, B>>>(a, x, is, IS);
   sumKernel<<<1, G>>>(a, a, G);
 }
@@ -545,14 +545,14 @@ __global__ void sumIfNotKernel(T *a, const T *x, const C *cs, size_t N) {
 template <class T, class C>
 void sumIfNotMemcpyCu(T *a, const T *x, const C *cs, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumIfNotKernel<<<G, B>>>(a, x, cs, N);
 }
 
 template <class T, class C>
 void sumIfNotInplaceCu(T *a, const T *x, const C *cs, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumIfNotKernel<<<G, B>>>(a, x, cs, N);
   sumKernel<<<1, G>>>(a, a, G);
 }
@@ -590,14 +590,14 @@ __global__ void sumMultiplyKernel(T *a, const T *x, const T *y, size_t N) {
 template <class T>
 void sumMultiplyMemcpyCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumMultiplyKernel<<<G, B>>>(a, x, y, N);
 }
 
 template <class T>
 void sumMultiplyInplaceCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   sumMultiplyKernel<<<G, B>>>(a, x, y, N);
   sumKernel<<<1, G>>>(a, a, G);
 }
@@ -635,14 +635,14 @@ __global__ void sumMultiplyAtKernel(T *a, const T *x, const T *y, const K *is, s
 template <class T, class K>
 void sumMultiplyAtMemcpyCu(T *a, const T *x, const T *y, const K *is, size_t IS) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(IS, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(IS, B, int()), GRID_DIM_R<T>());
   sumMultiplyAtKernel<<<G, B>>>(a, x, y, is, IS);
 }
 
 template <class T, class K>
 void sumMultiplyAtInplaceCu(T *a, const T *x, const T *y, const K *is, size_t IS) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(IS, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(IS, B, int()), GRID_DIM_R<T>());
   sumMultiplyAtKernel<<<G, B>>>(a, x, y, is, IS);
   sumKernel<<<1, G>>>(a, a, G);
 }
@@ -680,14 +680,14 @@ __global__ void l1NormKernel(T *a, const T *x, const T *y, size_t N) {
 template <class T>
 void l1NormMemcpyCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   l1NormKernel<<<G, B>>>(a, x, y, N);
 }
 
 template <class T>
 void l1NormInplaceCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   l1NormKernel<<<G, B>>>(a, x, y, N);
   sumKernel<<<1, G>>>(a, a, G);
 }
@@ -726,14 +726,14 @@ __global__ void l2NormKernel(T *a, const T *x, const T *y, size_t N) {
 template <class T>
 void l2NormMemcpyCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   l2NormKernel<<<G, B>>>(a, x, y, N);
 }
 
 template <class T>
 void l2NormInplaceCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   l2NormKernel<<<G, B>>>(a, x, y, N);
   sumKernel<<<1, G>>>(a, a, G);
 }
@@ -771,14 +771,14 @@ __global__ void liNormKernel(T *a, const T *x, const T *y, size_t N) {
 template <class T>
 void liNormMemcpyCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   liNormKernel<<<G, B>>>(a, x, y, N);
 }
 
 template <class T>
 void liNormInplaceCu(T *a, const T *x, const T *y, size_t N) {
   const int B = BLOCK_DIM_R<T>();
-  const int G = min(ceilDiv(N, B), GRID_DIM_R<T>());
+  const int G = min(ceilDivAs(N, B, int()), GRID_DIM_R<T>());
   liNormKernel<<<G, B>>>(a, x, y, N);
   maxKernel<<<1, G>>>(a, a, G);
 }

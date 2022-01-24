@@ -24,15 +24,15 @@ void pagerankFactor(vector<T>& a, const vector<K>& vdata, K i, K n, T p) {
 }
 
 
-template <class T, class O, class K>
-void pagerankCalculate(vector<T>& a, const vector<T>& c, const vector<O>& vfrom, const vector<K>& efrom, K i, K n, T c0) {
+template <class T, class K>
+void pagerankCalculate(vector<T>& a, const vector<T>& c, const vector<size_t>& vfrom, const vector<K>& efrom, K i, K n, T c0) {
   for (K v=i; v<i+n; v++)
     a[v] = c0 + sumValuesAt(c, sliceIterable(efrom, vfrom[v], vfrom[v+1]));
 }
 
 
-template <class T, class O, class K>
-int pagerankPlainLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<O>& vfrom, const vector<K>& efrom, const vector<K>& vdata, K i, K n, K N, T p, T E, int L) {
+template <class T, class K>
+int pagerankPlainLoop(vector<T>& a, vector<T>& r, vector<T>& c, const vector<T>& f, const vector<size_t>& vfrom, const vector<K>& efrom, const vector<K>& vdata, K i, K n, K N, T p, T E, int L) {
   T c0 = (1-p)/N;
   int l = 1;
   for (; l<L; l++) {

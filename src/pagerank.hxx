@@ -94,7 +94,7 @@ struct PagerankResult {
   static PagerankResult<T> initial(const G& x, const vector<T>* q=nullptr) {
     auto N = x.order();
     auto a = q? *q : createContainer(x, T());
-    if (!q) fillAt(a, T(1)/N, x.vertices());
+    if (!q) fillValueAt(a, x.vertexKeys(), T(1)/N);
     return {a, 0, 0};
   }
 };

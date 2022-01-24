@@ -80,11 +80,11 @@ inline auto createCompressedContainer(const G& x, const T& _) {
 
 
 template <class G, class T, class J>
-inline void decompressContainer(vector<T>& a, const G& x, const vector<T>& vs, const J& ks) {
+inline void decompressContainerTo(vector<T>& a, const G& x, const vector<T>& vs, const J& ks) {
   scatterValues(vs, ks, a);
 }
 template <class G, class T>
-inline void decompressContainer(vector<T>& a, const G& x, const vector<T>& vs) {
+inline void decompressContainerTo(vector<T>& a, const G& x, const vector<T>& vs) {
   decompressContainerTo(a, x, vs, x.vertexKeys());
 }
 template <class G, class T, class J>

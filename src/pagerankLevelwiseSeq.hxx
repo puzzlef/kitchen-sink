@@ -33,14 +33,15 @@ using std::move;
 // @returns {ranks, iterations, time}
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankLevelwiseSeq(const G& x, const H& xt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
+  using K = typename G::key_type;
   auto N  = xt.order();  if (N==0) return PagerankResult<T>::initial(xt, q);
   const auto& cs = componentsD(x, xt, D);
   const auto& b  = blockgraphD(x, cs, D);
   const auto& bt = blockgraphTransposeD(b, D);
-  auto gs = levelwiseGroupedComponentsFrom(cs, bt);
+  auto gs = levelwiseGroupedComponentsFrom(cs, b, bt);
   auto ns = transformIterable(gs, [&](const auto& g) { return g.size(); });
   auto ks = joinValuesVector(gs);
-  return pagerankSeq(xt, ks, 0, ns, pagerankComponentwiseSeqLoop<T, decltype(ns)>, q, o);
+  return pagerankSeq(xt, ks, 0, ns, pagerankComponentwiseSeqLoop<T, K, decltype(ns)>, q, o);
 }
 template <class G, class T=float>
 PagerankResult<T> pagerankLevelwiseSeq(const G& x, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
@@ -56,17 +57,18 @@ PagerankResult<T> pagerankLevelwiseSeq(const G& x, const vector<T> *q=nullptr, c
 
 template <class G, class H, class T=float>
 PagerankResult<T> pagerankLevelwiseSeqDynamic(const G& x, const H& xt, const G& y, const H& yt, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {
+  using K = typename G::key_type;
   auto N  = yt.order();  if (N==0) return PagerankResult<T>::initial(yt, q);
   const auto& cs = componentsD(x, xt, D);
   const auto& b  = blockgraphD(x, cs, D);
   const auto& bt = blockgraphTransposeD(b, D);
-  auto gi = levelwiseGroupIndices(bt);
-  auto [is, n] = dynamicComponentIndices(x, y, cs, b);  if (n==0) return PagerankResult<T>::initial(yt, q);
+  auto gi = levelwiseGroupIndices(b, bt);
+  auto [is, n] = dynamicComponentIndices(x, xt, y, yt, cs, b);  if (n==0) return PagerankResult<T>::initial(yt, q);
   auto ig = groupValuesVector(sliceIterable(is, 0, n), [&](auto i) { return gi[i]; });
   auto gs = joinAt2dVector(cs, ig);
   auto ns = transformIterable(gs, [&](const auto& g) { return g.size(); });
   auto ks = joinValuesVector(gs); joinAt(cs, sliceIterable(is, n), ks);
-  return pagerankSeq(yt, ks, 0, ns, pagerankComponentwiseSeqLoop<T, decltype(ns)>, q, o);
+  return pagerankSeq(yt, ks, 0, ns, pagerankComponentwiseSeqLoop<T, K, decltype(ns)>, q, o);
 }
 template <class G, class T=float>
 PagerankResult<T> pagerankLevelwiseSeqDynamic(const G& x, const G& y, const vector<T> *q=nullptr, const PagerankOptions<T>& o={}, const PagerankData<G> *D=nullptr) {

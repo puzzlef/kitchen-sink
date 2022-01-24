@@ -34,8 +34,8 @@ void pagerankFactorOmp(vector<T>& a, const vector<K>& vdata, K i, K n, T p) {
 // ------------------
 // For rank calculation from in-edges.
 
-template <class T, class O, class K>
-void pagerankCalculateOmp(vector<T>& a, const vector<T>& c, const vector<O>& vfrom, const vector<K>& efrom, K i, K n, T c0) {
+template <class T, class K>
+void pagerankCalculateOmp(vector<T>& a, const vector<T>& c, const vector<size_t>& vfrom, const vector<K>& efrom, K i, K n, T c0) {
   #pragma omp parallel for num_threads(32) schedule(auto)
   for (K v=i; v<i+n; v++)
     a[v] = c0 + sumValuesAt(c, sliceIterable(efrom, vfrom[v], vfrom[v+1]));

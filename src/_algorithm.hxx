@@ -290,7 +290,7 @@ template <class I, class FM>
 inline auto group_values_unordered_map(I ib, I ie, FM fm) {
   using K = remove_reference_t<decltype(fm(*ib))>;
   using V = typename iterator_traits<I>::value_type;
-  unordered_map<K, size_t> a;
+  unordered_map<K, vector<V>> a;
   return group_values(ib, ie, a, fm);
 }
 template <class I>
