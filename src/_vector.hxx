@@ -144,38 +144,44 @@ void joinIf(const J& xs, vector2d<T>& a, F fn) {
   for (const auto& x : xs) {
     auto& b = a.back();
     if (a.empty() || !fn(b, x)) a.push_back(x);
-    else b.insert(b.end(), x.begin(), x.end());
+    else copyAppend(x, b);
   }
 }
 template <class J, class F>
 inline auto joinIfVector(const J& xs, F fn) {
   using I = decltype(xs.begin());
   using X = typename iterator_traits<I>::value_type;
-  using T = typename iterator_traits<X>::value_type;
+  using T = typename X::value_type;  // only for vector!
   vector2d<T> a; joinIf(xs, a, fn);
   return a;
 }
 
 
-template <class T, class J>
-void joinUntilSize(const J& xs, vector2d<T>& a, size_t S) {
+template <class J, class T>
+inline void joinUntilSize(const J& xs, vector2d<T>& a, size_t S) {
   auto fn = [&](const auto& b, const auto& x) { return b.size()<S; };
   joinIf(xs, a, fn);
 }
-template <class T, class J>
+template <class J>
 inline auto joinUntilSizeVector(const J& xs, size_t S) {
+  using I = decltype(xs.begin());
+  using X = typename iterator_traits<I>::value_type;
+  using T = typename X::value_type;  // only for vector!
   vector2d<T> a; joinUntilSize(xs, a, S);
   return a;
 }
 
 
-template <class T, class J>
+template <class J, class T>
 void joinValues(const J& xs, vector<T>& a) {
   for (const auto& x : xs)
-    a.insert(a.end(), x.begin(), x.end());
+    copyAppend(x, a);
 }
-template <class T, class J>
-auto joinValuesVector(const J& xs) {
+template <class J>
+inline auto joinValuesVector(const J& xs) {
+  using I = decltype(xs.begin());
+  using X = typename iterator_traits<I>::value_type;
+  using T = typename X::value_type;  // only for vector!
   vector<T> a; join(xs, a);
   return a;
 }
@@ -186,12 +192,24 @@ auto joinValuesVector(const J& xs) {
 // JOIN-AT-*
 // ---------
 
+template <class T, class J>
+void joinAt(const vector2d<T>& xs, const J& is, vector<T>& a) {
+  for (auto i : is)
+    copyAppend(xs[i], a);
+}
+template <class T, class J>
+inline auto joinAtVector(const vector2d<T>& xs, const J& is) {
+  vector<T> a; joinAt(xs, is, a);
+  return a;
+}
+
+
 template <class T, class J, class F>
 void joinAtIf(const vector2d<T>& xs, const J& is, vector2d<T>& a, F fn) {
-  for (int i : is) {
+  for (auto i : is) {
     auto& b = a.back();
     if (a.empty() || !fn(b, xs[i])) a.push_back(xs[i]);
-    else b.insert(b.end(), xs[i].begin(), xs[i].end());
+    else copyAppend(xs[i], b);
   }
 }
 template <class T, class J, class F>
@@ -209,18 +227,6 @@ void joinAtUntilSize(const vector2d<T>& xs, const J& is, vector2d<T>& a, size_t 
 template <class T, class J>
 inline auto joinAtUntilSizeVector(const vector2d<T>& xs, const J& is, size_t N) {
   vector2d<T> a; joinAtUntilSize(xs, is, a, N);
-  return a;
-}
-
-
-template <class T, class J>
-void joinAt(const vector2d<T>& xs, const J& is, vector<T>& a) {
-  for (auto i : is)
-    a.insert(a.end(), xs[i].begin(), xs[i].end());
-}
-template <class T, class J>
-inline auto joinAtVector(const vector2d<T>& xs, const J& is) {
-  vector<T> a; joinAt(xs, is, a);
   return a;
 }
 
@@ -454,7 +460,7 @@ inline void addValueAt(vector<T>& a, const J& is, const U& v) {
   addValueAt(a.data(), is, v);
 }
 template <class T, class J, class U>
-inline void addValueAt(vector<T>& a, int i, const J& is, const U& v) {
+inline void addValueAt(vector<T>& a, size_t i, const J& is, const U& v) {
   addValueAt(a.data()+i, is, v);
 }
 
