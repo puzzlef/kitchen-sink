@@ -16,12 +16,13 @@ using std::is_same;
 // PAGERANK-CORE
 // -------------
 
-template <class G, class T=float>
-PagerankResult<T> pagerankNvgraphCore(const G& xt, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
+template <class H, class T=float>
+PagerankResult<T> pagerankNvgraphCore(const H& xt, const vector<T> *q=nullptr, PagerankOptions<T> o={}) {
+  using K = typename H::key_type;
+  K   N = xt.order();
   T   p = o.damping;
   T   E = o.tolerance;
   int L = o.maxIterations;
-  int N = xt.order();
   nvgraphHandle_t     h;
   nvgraphGraphDescr_t g;
   struct nvgraphCSCTopology32I_st csc;
@@ -31,10 +32,10 @@ PagerankResult<T> pagerankNvgraphCore(const G& xt, const vector<T> *q=nullptr, P
   vector<T> ranks(N);
   if (N==0) return {ranks};
   auto ks    = vertices(xt);
-  auto vfrom = sourceOffsets(xt);
+  auto vfrom = sourceOffsetsAs(xt, K());  // CSC32 only!
   auto efrom = destinationIndices(xt);
-  auto vdata = vertexData(xt, ks, [&](int v) { return xt.vertexData(v)==0? T(1) : T(); });
-  auto edata = edgeData(xt, ks, [&](int v, int u) { return T(1)/xt.vertexData(u); });
+  auto vdata = vertexData(xt, ks, [&](auto v) { return xt.vertexData(v)==0? T(1) : T(); });
+  auto edata = edgeData(xt, ks, [&](auto v, auto u) { return T(1)/xt.vertexData(u); });
   if (q) ranks = compressContainer(xt, *q);
 
   TRY_NVGRAPH( nvgraphCreate(&h) );
